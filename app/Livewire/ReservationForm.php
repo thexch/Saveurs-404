@@ -6,6 +6,8 @@ use Livewire\Component;
 use App\Models\Reservation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 
 class ReservationForm extends Component
 {
@@ -37,7 +39,7 @@ class ReservationForm extends Component
                 'date' => $this->date,
                 'time' => $this->time,
                 'guests' => $this->guests,
-                'user_id' => Auth::id(), // Ajout de l'ID de l'utilisateur connecté
+                'user_id' => Auth::id(),
             ]);
 
             session()->flash('message', 'Reservation successfully created.');
@@ -46,8 +48,39 @@ class ReservationForm extends Component
         });
     }
 
+    public function getAvailableTimes()
+    {
+        $times = [];
+        $start = Carbon::createFromTime(12, 0);
+        $end = Carbon::createFromTime(14, 0);
+        $interval = 15;
+
+        while ($start <= $end) {
+            $times[] = $start->format('H:i');
+            $start->addMinutes($interval);
+        }
+
+        $start = Carbon::createFromTime(19, 0);
+        $end = Carbon::createFromTime(22, 0);
+
+        while ($start <= $end) {
+            $times[] = $start->format('H:i');
+            $start->addMinutes($interval);
+        }
+
+        if ($this->date == Carbon::today()->format('Y-m-d')) {
+            $times = array_filter($times, function ($time) {
+                return Carbon::createFromFormat('H:i', $time)->greaterThanOrEqualTo(Carbon::now());
+            });
+        }
+
+        return $times;
+    }
+
     public function render()
     {
-        return view('livewire.reservation-form');
+        return view('livewire.reservation-form', [
+            'availableTimes' => $this->getAvailableTimes(),
+        ]);
     }
 }

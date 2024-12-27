@@ -8,8 +8,14 @@ class Reservation extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'reservation_id';
     protected $table = 'reservations';
     protected $fillable = ['name', 'email', 'phone', 'date', 'time', 'guests', 'user_id' ];
 
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'user_id');
+    }
 
 }

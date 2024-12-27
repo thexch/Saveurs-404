@@ -62,27 +62,27 @@ new class extends Component
     }
 }; ?>
 
-<section>
+<section class>
     <header>
-        <h2 class="text-lg font-medium text-gray-900">
+        <h2 class="text-lg font-medium text-white">
             {{ __('Information du profil') }}
         </h2>
 
-        <p class="mt-1 text-sm text-gray-600">
+        <p class="mt-1 text-sm text-gray-400">
             {{ __("Mettre à jour les informations de profil et l'adresse e-mail de votre compte.") }}
         </p>
     </header>
 
     <form wire:submit="updateProfileInformation" class="mt-6 space-y-6">
         <div>
-            <x-input-label for="name" :value="__('Nom')" />
-            <x-text-input wire:model="name" id="name" name="name" type="text" class="mt-1 block w-full" required autofocus autocomplete="name" />
+            <x-input-label for="name" :value="__('Nom')" class="text-white"/>
+            <x-text-input wire:model="name" id="name" name="name" type="text" class="mt-1 block w-full text-gray-900" required autofocus autocomplete="name" />
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
         <div>
-            <x-input-label for="email" :value="__('E-mail')" />
-            <x-text-input wire:model="email" id="email" name="email" type="email" class="mt-1 block w-full" required autocomplete="username" />
+            <x-input-label for="email" :value="__('E-mail')" class="text-white"/>
+            <x-text-input wire:model="email" id="email" name="email" type="email" class="mt-1 block w-full text-gray-900" required autocomplete="username" />
             <x-input-error class="mt-2" :messages="$errors->get('email')" />
 
             @if (auth()->user() instanceof \Illuminate\Contracts\Auth\MustVerifyEmail && ! auth()->user()->hasVerifiedEmail())
@@ -105,7 +105,7 @@ new class extends Component
         </div>
 
         <div class="flex items-center gap-4">
-            <x-primary-button>{{ __('Sauvegarder') }}</x-primary-button>
+            <x-primary-button class="bg-gray-700">{{ __('Sauvegarder') }}</x-primary-button>
 
             <x-action-message class="me-3" on="profile-updated">
                 {{ __('Sauvegardé.') }}
