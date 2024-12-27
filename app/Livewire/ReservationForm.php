@@ -42,7 +42,7 @@ class ReservationForm extends Component
                 'user_id' => Auth::id(),
             ]);
 
-            session()->flash('message', 'Reservation successfully created.');
+            session()->flash('success', 'Votre réservation a été confirmée.');
 
             $this->reset();
         });

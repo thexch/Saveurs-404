@@ -17,7 +17,41 @@
 
 <body class="bg-gray-900 text-white">
     <x-app-layout>
-        <!-- Hero Section -->
+        <!-- Notifications -->
+        @if (session('success'))
+            <div id="success-message" class="bg-green-500 text-white p-4 rounded mb-4 transition-opacity duration-1000">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if (session('error'))
+            <div id="error-message" class="bg-red-500 text-white p-4 rounded mb-4 transition-opacity duration-1000">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
+                    var successMessage = document.getElementById('success-message');
+                    if (successMessage) {
+                        successMessage.classList.add('opacity-0');
+                        setTimeout(function() {
+                            successMessage.style.display = 'none';
+                        }, 1000);
+                    }
+
+                    var errorMessage = document.getElementById('error-message');
+                    if (errorMessage) {
+                        errorMessage.classList.add('opacity-0');
+                        setTimeout(function() {
+                            errorMessage.style.display = 'none';
+                        }, 1000);
+                    }
+                }, 3000); 
+            });
+        </script>
+
+        <!-- Présentation -->
         <div class="relative">
             <img src="{{ asset('image.png') }}" alt="Restaurant" class="w-full h-96 object-cover">
             <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -25,7 +59,7 @@
             </div>
         </div>
 
-        <!-- Testimonials Section -->
+        <!-- Avis -->
         <div class="py-12">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
         <h2 class="text-2xl font-bold mb-6">Avis de nos clients</h2>
@@ -119,60 +153,64 @@
         </div>
     </div>
 </div>
- <!-- Bouton MODAL -->
- <div class="text-center my-4" x-data="{ open: false }">
+    <!-- Bouton MODAL avis-->
+<div class="text-center my-4" x-data="{ open: false }">
     <button type="button" @click="open = true" class="btn btn-primary">
         Laissez votre avis
     </button>
 
-    <!-- MODAL -->
+    <!-- MODAL avis-->
     <template x-teleport="body">
-        <div x-show="open" 
-             class="fixed inset-0 z-50 overflow-y-auto" 
-             x-cloak 
-             x-transition:enter="ease-out duration-1000"
-             x-transition:enter-start="opacity-0"
-             x-transition:enter-end="opacity-100"
-             x-transition:leave="ease-in duration-300"
-             x-transition:leave-start="opacity-100"
-             x-transition:leave-end="opacity-0">
-            
+        <div x-show="open" class="fixed inset-0 z-50 overflow-y-auto" x-cloak>
             <div class="fixed inset-0 bg-black opacity-50"></div>
-            
             <div class="relative min-h-screen flex items-center justify-center p-4">
-                <div class="relative w-full max-w-2xl bg-gray-900 rounded-lg shadow-xl">                     
-                    <button @click="open = false" class="absolute top-3 right-3 text-gray-400 hover:text-gray-200">
+                <div class="relative w-full max-w-2xl bg-gray-900 rounded-lg shadow-xl">
+                <button @click="open = false" class="absolute top-3 right-3 text-gray-400 hover:text-gray-200">
                         <span class="text-2xl">&times;</span>
                     </button>
-
                     <div class="p-6">
-                        <h3 class="text-xl font-semibold mb-4 text-white">Donnez votre avis</h3>
-
                         @auth
-                            <form action="{{ route('avis.store') }}" method="POST" class="space-y-4" x-data="{ rating: 0 }">
-                                @csrf
-                                <div>
-                                    <label class="block text-sm font-medium text-white mb-2">Note</label>
-                                    <div class="flex space-x-1">
-                                        <template x-for="i in 5">
-                                            <button type="button" @click="rating = i" :class="{'text-yellow-500': i <= rating, 'text-gray-400': i > rating}" class="text-2xl">
-                                                ★
-                                            </button>
-                                        </template>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label for="avis" class="block text-sm font-medium text-white">Votre avis</label>
-                                    <textarea id="avis" name="avis" rows="4" class="mt-1 block w-full bg-gray-700 text-white border-gray-600 rounded-lg p-2"></textarea>
-                                </div>
+                        <h3 class="text-xl font-semibold mb-4 text-white">Donnez votre avis</h3>
+                        
+                        <form action="{{ route('avis.store') }}" method="POST" class="space-y-4" x-data="{ rating: 0 }">
+    @csrf
+    <div>
+        <label class="block text-sm font-medium text-white mb-2">Note</label>
+        <div class="flex space-x-1">
+            <template x-for="i in 5">
+                <button type="button" 
+                    @click="rating = i"
+                    @mouseover="$el.parentElement.querySelectorAll('svg').forEach((svg, index) => {
+                        svg.classList.toggle('text-yellow-400', index < i);
+                    })"
+                    @mouseleave="$el.parentElement.querySelectorAll('svg').forEach((svg, index) => {
+                        svg.classList.toggle('text-yellow-400', index < rating);
+                    })"
+                    class="focus:outline-none">
+                    <svg class="w-8 h-8" :class="rating >= i ? 'text-yellow-400' : 'text-gray-500'" 
+                        fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                    </svg>
+                </button>
+            </template>
+        </div>
+        <input type="hidden" name="note" :value="rating" required>
+    </div>
 
-                                <div class="flex justify-end space-x-3 mt-6">
-                                    <button type="submit"
-                                        class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500">
-                                        Envoyer
-                                    </button>
-                                </div>
-                            </form>
+                            <div>
+                                <label class="block text-sm font-medium text-white">Votre commentaire</label>
+                                <textarea name="commentaire" rows="3" required
+                                    class="mt-1 block w-full bg-gray-700 text-white border-gray-600 rounded-lg p-2"></textarea>
+                            </div>
+
+                            <div class="flex justify-end space-x-3 mt-6">
+                                
+                                <button type="submit"
+                                    class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500">
+                                    Envoyer
+                                </button>
+                            </div>
+                        </form>
                         @else
                             <p class="text-gray-400">Vous devez être connecté pour laisser un avis. 
                                 <a href="{{ route('login') }}" class="text-indigo-600 hover:text-indigo-900">Se connecter</a>
@@ -187,8 +225,7 @@
 
 
 
-
-        <!-- Footer Section -->
+        <!-- Bas de page -->
         <footer class="bg-gray-900 py-6">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center">

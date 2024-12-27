@@ -32,6 +32,7 @@ Route::delete('/reservations/{id}', [ReservationController::class, 'destroy'])
 Route::post('/avis', [AvisController::class, 'store'])
     ->name('avis.store');
 
+
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
         // Route pour la liste des réservations
         Route::get('/gestionreservations', [GestionReservationController::class, 'index'])

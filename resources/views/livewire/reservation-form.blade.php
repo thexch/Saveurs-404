@@ -1,10 +1,43 @@
 <div class="max-w-md mx-auto p-8 space-y-6 bg-gray-800 rounded-lg shadow-md">
-    <form class="space-y-6">
-        <!-- Nom -->
+    <!-- Notifications -->
+    @if (session('success'))
+        <div id="success-message" class="bg-green-500 text-white p-4 rounded mb-4 transition-opacity duration-1000">
+            {{ session('success') }}
+        </div>
+    @endif
+    @if (session('error'))
+        <div id="error-message" class="bg-red-500 text-white p-4 rounded mb-4 transition-opacity duration-1000">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                var successMessage = document.getElementById('success-message');
+                if (successMessage) {
+                    successMessage.classList.add('opacity-0');
+                    setTimeout(function() {
+                        successMessage.style.display = 'none';
+                    }, 1000);
+                }
+
+                var errorMessage = document.getElementById('error-message');
+                if (errorMessage) {
+                    errorMessage.classList.add('opacity-0');
+                    setTimeout(function() {
+                        errorMessage.style.display = 'none';
+                    }, 1000);
+                }
+            }, 3000); 
+        });
+    </script>
+    <form wire:submit.prevent="submit" class="space-y-6">
+    <!-- Nom -->
         <div class="relative z-0 w-full mb-5 group">
             <input type="text" id="name" wire:model.live="name" 
                 class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-600 appearance-none text-white focus:outline-none focus:ring-0 focus:border-indigo-500 peer" 
-                placeholder=" " />
+                placeholder=" " required />
             <label for="name" 
                 class="peer-focus:font-medium absolute text-sm text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 peer-focus:text-indigo-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
                 Nom
@@ -15,7 +48,7 @@
         <div class="relative z-0 w-full mb-5 group">
             <input type="email" id="email" wire:model.live="email" 
                 class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-600 appearance-none text-white focus:outline-none focus:ring-0 focus:border-indigo-500 peer" 
-                placeholder=" " />
+                placeholder=" " required/>
             <label for="email" 
                 class="peer-focus:font-medium absolute text-sm text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 peer-focus:text-indigo-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
                 Email
@@ -26,7 +59,7 @@
         <div class="relative z-0 w-full mb-5 group">
             <input type="text" id="phone" wire:model.live="phone" 
                 class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-600 appearance-none text-white focus:outline-none focus:ring-0 focus:border-indigo-500 peer" 
-                placeholder=" " />
+                placeholder=" " required/>
             <label for="phone" 
                 class="peer-focus:font-medium absolute text-sm text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 peer-focus:text-indigo-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
                 Téléphone
@@ -38,7 +71,7 @@
             <!-- Date -->
             <div class="relative z-0 w-full mb-5 group">
                 <input type="date" id="date" wire:model.live="date" min="{{ \Carbon\Carbon::today()->format('Y-m-d') }}"
-                    class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-600 appearance-none text-white focus:outline-none focus:ring-0 focus:border-indigo-500 peer" />
+                    class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-600 appearance-none text-white focus:outline-none focus:ring-0 focus:border-indigo-500 peer" required />
                 <label for="date" 
                     class="peer-focus:font-medium absolute text-sm text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 peer-focus:text-indigo-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
                     Date
@@ -48,7 +81,7 @@
             <!-- Heure -->
             <div class="relative z-0 w-full mb-5 group">
             <select id="time" wire:model.live="time" 
-    class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-600 appearance-none text-white focus:outline-none focus:ring-0 focus:border-indigo-500 peer [&>option]:bg-gray-700 [&>option]:text-white">
+    class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-600 appearance-none text-white focus:outline-none focus:ring-0 focus:border-indigo-500 peer [&>option]:bg-gray-700 [&>option]:text-white" required>
     <option value="" class="bg-gray-700">Sélectionnez une heure</option>
     @foreach($availableTimes as $time)
         <option value="{{ $time }}" class="bg-gray-700">{{ $time }}</option>
@@ -65,7 +98,7 @@
         <div class="relative z-0 w-full mb-5 group">
             <input type="number" id="guests" wire:model.live="guests" 
                 class="block py-2.5 px-0 w-full text-sm bg-transparent border-0 border-b-2 border-gray-600 appearance-none text-white focus:outline-none focus:ring-0 focus:border-indigo-500 peer" 
-                placeholder=" " />
+                placeholder=" " required/>
             <label for="guests" 
                 class="peer-focus:font-medium absolute text-sm text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 peer-focus:text-indigo-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">
                 Nombre de convives
