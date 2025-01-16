@@ -17,5 +17,9 @@ class Reservation extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'user_id');
     }
+    public function tables()
+    {
+        return $this->belongsToMany(Table::class, 'reservation_table', 'reservation_id', 'table_id');
+    }
 
 }

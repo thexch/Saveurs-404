@@ -1,13 +1,14 @@
 <?php
 
+
 namespace App\Livewire;
 
 use Livewire\Component;
 use App\Models\Reservation;
+use App\Models\Table;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Mail;
 
 class ReservationForm extends Component
 {
@@ -17,6 +18,7 @@ class ReservationForm extends Component
     public $date;
     public $time;
     public $guests;
+    public $table_ids = [];
 
     protected $rules = [
         'name' => 'required|string|max:255',
@@ -25,6 +27,8 @@ class ReservationForm extends Component
         'date' => 'required|date',
         'time' => 'required|date_format:H:i',
         'guests' => 'required|integer|min:1',
+        'table_ids' => 'required|array|min:1',
+        'table_ids.*' => 'exists:tables,table_id',
     ];
 
     public function submit()
@@ -32,7 +36,7 @@ class ReservationForm extends Component
         DB::transaction(function () {
             $this->validate();
 
-            Reservation::create([
+            $reservation = Reservation::create([
                 'name' => $this->name,
                 'email' => $this->email,
                 'phone' => $this->phone,
@@ -41,6 +45,9 @@ class ReservationForm extends Component
                 'guests' => $this->guests,
                 'user_id' => Auth::id(),
             ]);
+
+            // Attacher les tables sélectionnées à la réservation
+            $reservation->tables()->attach($this->table_ids);
 
             session()->flash('success', 'Votre réservation a été confirmée.');
 
@@ -77,10 +84,43 @@ class ReservationForm extends Component
         return $times;
     }
 
+    public function getAvailableTables()
+{
+    $tables = Table::all();
+    $filteredTables = [];
+    $exactMatchFound = false;
+    $closestTable = null;
+
+    foreach ($tables as $table) {
+        if ($table->nb_sieges == $this->guests) {
+            $filteredTables[] = ['table' => $table, 'recommended' => true];
+            $exactMatchFound = true;
+        } elseif ($table->nb_sieges > $this->guests) {
+            if ($closestTable === null || $table->nb_sieges < $closestTable->nb_sieges) {
+                $closestTable = $table;
+            }
+        }
+    }
+
+    if (!$exactMatchFound && $closestTable !== null) {
+        array_unshift($filteredTables, ['table' => $closestTable, 'recommended' => true]); 
+    }
+
+    
+    foreach ($tables as $table) {
+        if (!in_array(['table' => $table, 'recommended' => true], $filteredTables)) {
+            $filteredTables[] = ['table' => $table, 'recommended' => false];
+        }
+    }
+
+    return $filteredTables;
+}
+
     public function render()
     {
         return view('livewire.reservation-form', [
             'availableTimes' => $this->getAvailableTimes(),
+            'availableTables' => $this->getAvailableTables(), // Utiliser les tables filtrées
         ]);
     }
 }

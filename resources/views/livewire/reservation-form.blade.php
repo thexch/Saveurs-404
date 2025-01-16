@@ -104,6 +104,27 @@
                 Nombre de convives
             </label>
         </div>
+        <!-- Choix des tables -->
+        <div class="relative z-0 w-full mb-5 group">
+            <label for="table_ids" class="block text-sm font-medium text-white">Choix des tables</label>
+            <div id="table_ids" class="block w-full bg-gray-700 text-white border-gray-600 rounded-lg p-2">
+                @if(empty($guests))
+                    <p class="text-sm text-red-500">Veuillez spécifier un nombre de convives</p>
+                @else
+                @foreach($availableTables as $tableData)
+                    <div class="flex items-center mb-2">
+                        <input type="checkbox" id="table_{{ $tableData['table']->table_id }}" wire:model="table_ids" value="{{ $tableData['table']->table_id }}" class="form-checkbox h-4 w-4 text-indigo-600 transition duration-150 ease-in-out">                            
+                        <label for="table_{{ $tableData['table']->table_id }}" class="ml-2 block text-sm leading-5 text-white">
+                            Table {{ $tableData['table']->table_id }} - {{ $tableData['table']->nb_sieges }} places
+                            @if($tableData['recommended'])
+                                -> table conseillée
+                            @endif
+                        </label>
+                    </div>
+                @endforeach
+                @endif
+            </div>
+        </div>
 
         <!-- Bouton Réserver -->
         <button wire:click="submit" 
