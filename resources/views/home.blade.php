@@ -156,7 +156,7 @@
     <!-- Bouton MODAL avis-->
 <div class="text-center my-4" x-data="{ open: false }">
     <button type="button" @click="open = true" class="btn btn-primary">
-        Laissez votre avis
+        Laissez votre avis !
     </button>
 
     <!-- MODAL avis-->
