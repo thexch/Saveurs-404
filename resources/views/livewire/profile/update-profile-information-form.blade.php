@@ -24,24 +24,28 @@ new class extends Component
      * Update the profile information for the currently authenticated user.
      */
     public function updateProfileInformation(): void
-    {
-        $user = Auth::user();
+{
+    $user = Auth::user();
 
-        $validated = $this->validate([
-            'name' => ['required', 'string', 'max:255'],
+    // Validez d'abord uniquement le nom
+    $validated = $this->validate([
+        'name' => ['required', 'string', 'max:255'],
+    ]);
+
+    // Validez l'email seulement s'il a été modifié
+    if ($this->email !== $user->email) {
+        $this->validate([
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique(User::class)->ignore($user->id)],
         ]);
-
-        $user->fill($validated);
-
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
-
-        $user->save();
-
-        $this->dispatch('profile-updated', name: $user->name);
+        $validated['email'] = $this->email;
+        $user->email_verified_at = null;
     }
+
+    $user->fill($validated);
+    $user->save();
+
+    $this->dispatch('profile-updated', name: $user->name);
+}
 
     /**
      * Send an email verification notification to the current user.

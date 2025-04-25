@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\AvisController;
+use App\Http\Controllers\ExportController; 
 use App\Http\Controllers\Admin\GestionReservationController;
 use App\Http\Controllers\Admin\GestionUserController;
 use App\Http\Controllers\Admin\AdminReservationController;
@@ -31,7 +32,10 @@ Route::delete('/reservations/{id}', [ReservationController::class, 'destroy'])
 
 Route::post('/avis', [AvisController::class, 'store'])
     ->name('avis.store');
-
+    
+Route::get('/export-user-data', [ExportController::class, 'exportUserData'])
+    ->middleware('auth')
+    ->name('export.user');    
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
         // Route pour la liste des réservations
@@ -57,6 +61,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         
         Route::delete('/users/{id}', [GestionUserController::class, 'destroy'])
             ->name('deleteuser');
+        
 });
 
 require __DIR__.'/auth.php';
